@@ -1,5 +1,7 @@
 const initialState = {
     authenticated: false,
+    host: '192.168.0.129:8089',
+    deviceName: null
 }
 
 const reducer = (state = initialState, action) => {
@@ -7,8 +9,19 @@ const reducer = (state = initialState, action) => {
     switch ( action.type ) {
         case 'AUTHENTICATED':
             return {
+                ...state,
                 authenticated: action.value
             }
+        case 'HOST_CHANGED':
+        return {
+            ...state,
+            host: action.value
+        }
+        case 'DEVICE_CHANGED':
+        return {
+            ...state,
+            deviceName: action.value
+        }
     }
     return state;
 }

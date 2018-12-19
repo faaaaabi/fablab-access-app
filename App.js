@@ -9,23 +9,59 @@
 import React, {Component} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import { Provider } from 'react-redux'
+import { COLOR, Toolbar, ThemeContext, getTheme } from 'react-native-material-ui';
 import NfcComponent from './Components/NfcComponent';
 
 // Redux
 import { createStore } from 'redux';
 import reducer from './store/reducer'
+import { persistStore, persistReducer } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import { PersistGate } from 'redux-persist/integration/react';
 
-const store = createStore(reducer)
+
+// Store & Persistance
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['host', 'deviceName']
+}
+
+const persistedReducer = persistReducer(persistConfig, reducer);
+const store = createStore(persistedReducer);
+const persistor = persistStore(store);
+
+// UI
+const uiTheme = {
+  palette: {
+    primaryColor: COLOR.green500,
+  },
+  toolbar: {
+    container: {
+      height: 50,
+    },
+  },
+};
+
 
 type Props = {};
 export default class App extends Component<Props> {
   render() {
     return (
       <Provider store={store}>
-        <View style={styles.container}>
-          <Text>Hallo</Text>
+        <PersistGate loading={null} persistor={persistor}>
+          <ThemeContext.Provider value={getTheme(uiTheme)}>
+          <Toolbar
+            leftElement="menu"
+            centerElement="Searchable"
+            searchable={{
+            autoFocus: true,
+            placeholder: 'Search',
+            }}
+          />
           <NfcComponent />
-        </View>
+          </ThemeContext.Provider>
+        </PersistGate>
       </Provider>
     );
   }

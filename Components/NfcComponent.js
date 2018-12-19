@@ -83,6 +83,26 @@ class NfcComponent extends Component {
                         </View>
                     }
 
+                          <TextInput
+                            style={{padding:10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                            onChangeText={(text) => this.props.onHostChange(text)}
+                            value={this.props.host}
+                           />
+
+                        <Button
+                            style={{marginTop: 20}}
+                            onPress={() => this._toggleDevice(this.props.deviceName)}
+                            title="Switch Device"
+                            color="#841584"
+                            accessibilityLabel="Toggle State of device"
+                        />
+
+                        <TextInput
+                            style={{marginTop: 20, height: 40, borderColor: 'gray', borderWidth: 1}}
+                            onChangeText={(text) => this.props.onDeviceChange(text)}
+                            value={this.props.deviceName}
+                        />
+
                     <Text style={{ marginTop: 20 }}>{`Current tag JSON: ${JSON.stringify(tag)}`}</Text>
                     { parsedText && <Text style={{ marginTop: 10, marginBottom: 20, fontSize: 18 }}>{`Parsed Text: ${parsedText}`}</Text>}
                 </View>
@@ -128,33 +148,6 @@ class NfcComponent extends Component {
         this.setState({isWriting: false});
         NfcManager.cancelNdefWrite()
             .then(() => console.log('write cancelled'))
-            .catch(err => console.warn(err))
-    }
-
-    _requestAndroidBeam = () => {
-        let {isWriting, urlToWrite, rtdType} = this.state;
-        if (isWriting) {
-            return;
-        }
-
-        let bytes;
-
-        if (rtdType === RtdType.URL) {
-            bytes = buildUrlPayload(urlToWrite);
-        } else if (rtdType === RtdType.TEXT) {
-            bytes = buildTextPayload(urlToWrite);
-        }
-
-        this.setState({isWriting: true});
-        NfcManager.setNdefPushMessage(bytes)
-            .then(() => console.log('beam request completed'))
-            .catch(err => console.warn(err))
-    }
-
-    _cancelAndroidBeam = () => {
-        this.setState({isWriting: false});
-        NfcManager.setNdefPushMessage(null)
-            .then(() => console.log('beam cancelled'))
             .catch(err => console.warn(err))
     }
 
@@ -290,7 +283,7 @@ class NfcComponent extends Component {
     }
 
     _checkAccess = async (id) => {
-        const response = await fetch(`http://192.168.0.129:8089/users/${id}/checkMachinePermission`);
+        const response = await fetch(`http://${this.props.host}/users/${id}/checkMachinePermission`);
         const responseJSON = await response.json();
         console.log('responseJson', responseJSON);
 
@@ -300,11 +293,19 @@ class NfcComponent extends Component {
             this.props.onAuthenticated(false);
         }
     }
+
+    _toggleDevice = async (deviceName) => {
+        if ( this.props.authenticated ) {
+            fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`);
+        }
+    }
 }
 
 const mapStateToProps = state => {
     return {
-        authenticated: state.authenticated
+        authenticated: state.authenticated,
+        host: state.host,
+        deviceName: state.deviceName
     };
 }
 
@@ -312,6 +313,14 @@ const mapDispatchToProps = dispatch => {
     return {
         onAuthenticated: (value) => dispatch({
             type: 'AUTHENTICATED',
+            value
+        }),
+        onHostChange: (value) => dispatch({
+            type: 'HOST_CHANGED',
+            value
+        }),
+        onDeviceChange: (value) => dispatch({
+            type: 'DEVICE_CHANGED',
             value
         }),
     };
