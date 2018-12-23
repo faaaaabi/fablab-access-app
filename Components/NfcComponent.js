@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    AppRegistry,
     View,
     Text,
     Button,
@@ -9,10 +8,10 @@ import {
     TouchableOpacity,
     Linking,
     TextInput,
-    Image,
     ScrollView,
 } from 'react-native';
 import NfcManager, {Ndef} from 'react-native-nfc-manager';
+import { Icon } from 'react-native-elements'
 
 const RtdType = {
     URL: 0,
@@ -62,28 +61,31 @@ class NfcComponent extends Component {
     }
 
     render() {
-        let { supported, enabled, tag, isWriting, urlToWrite, parsedText, rtdType } = this.state;
         return (
-            <ScrollView style={{flex: 1}}>
-                { Platform.OS === 'ios' && <View style={{ height: 60 }} /> }
-
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text>{`Is NFC supported ? ${supported}`}</Text>
-                    <Text>{`Is NFC enabled (Android only)? ${enabled}`}</Text>
-
-                    <TouchableOpacity style={{ marginTop: 20 }} onPress={this._clearMessages}>
-                        <Text>Clear</Text>
-                    </TouchableOpacity>
-
+                <View style={{ flex: 0.3, justifyContent: 'center', alignItems: 'center' }}>
                     {
-                        <View style={{padding: 10, marginTop: 20, backgroundColor: '#e0e0e0'}}>
-                          <Text style={{ fontSize: 60, fontWeight: 'bold', color: [this.props.authenticated ? (`#008000`) : (`#ff4040`)] }}>
-                            {!this.props.authenticated ? (`Locked`) : (`Unlocked`)}
-                          </Text>
+                        <View style={{}}>
+                          {!this.props.authenticated ? (<Icon
+                            name='lock'
+                            type='evilicon'
+                            color='red'
+                            size={400}
+                            />) : 
+                            (<Icon
+                               name='unlock'
+                               type='evilicon'
+                               color='green'
+                               size={400}
+                             />)}
+          
                         </View>
                     }
+                </View>
+        )
+    }
 
-                          <TextInput
+    /*
+                              <TextInput
                             style={{padding:10, height: 40, borderColor: 'gray', borderWidth: 1}}
                             onChangeText={(text) => this.props.onHostChange(text)}
                             value={this.props.host}
@@ -102,13 +104,9 @@ class NfcComponent extends Component {
                             onChangeText={(text) => this.props.onDeviceChange(text)}
                             value={this.props.deviceName}
                         />
-
                     <Text style={{ marginTop: 20 }}>{`Current tag JSON: ${JSON.stringify(tag)}`}</Text>
                     { parsedText && <Text style={{ marginTop: 10, marginBottom: 20, fontSize: 18 }}>{`Parsed Text: ${parsedText}`}</Text>}
-                </View>
-            </ScrollView>
-        )
-    }
+    */
 
     _requestFormat = () => {
         let {isWriting} = this.state;

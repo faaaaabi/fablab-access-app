@@ -11,6 +11,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import { Provider } from 'react-redux'
 import { COLOR, Toolbar, ThemeContext, getTheme } from 'react-native-material-ui';
 import NfcComponent from './Components/NfcComponent';
+import DeviceControl from './Components/DeviceControl';
 
 // Redux
 import { createStore } from 'redux';
@@ -50,16 +51,19 @@ export default class App extends Component<Props> {
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ThemeContext.Provider value={getTheme(uiTheme)}>
+          <ThemeContext.Provider value={getTheme(uiTheme)} style={{flex: 1}}>
           <Toolbar
             leftElement="menu"
-            centerElement="Searchable"
+            centerElement="Fablab Control"
             searchable={{
             autoFocus: true,
             placeholder: 'Search',
             }}
           />
-          <NfcComponent />
+          <View style={{flexDirection: 'row', flex: 1}}>
+            <DeviceControl/>
+            <NfcComponent/>
+          </View>
           </ThemeContext.Provider>
         </PersistGate>
       </Provider>
