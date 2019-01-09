@@ -27,7 +27,9 @@ $ npm install
 ```
 
 ### Konfiguration anpassen
-* unter store/reducer.js IP/Hostname des API-Gateways anpassen
+* unter store/reducer.js IP/Hostname des API-Gateways anpassen*
+
+\* nur notwendig, wenn die Interaktion mit dem API-Gateway stattfinden soll.
 
 ## App starten
 
