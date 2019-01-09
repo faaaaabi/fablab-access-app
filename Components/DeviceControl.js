@@ -27,7 +27,7 @@ class DeviceControl extends Component {
   }
 
   async componentDidMount() {
-    //await this.fetchDevicesToState('Regal1');
+    await this.fetchDevicesToState('Regal1');
   }
 
   render() {
@@ -39,23 +39,20 @@ class DeviceControl extends Component {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        marginTop: 10,
-        borderColor: '#000', 
-        borderRadius: 4, 
-        borderWidth: 0.5,
+        paddingTop:10
       }}>
         {this.state.devices.map(device =>
-                <View style={{
+                <View key={device.name} style={{
                   width: 60,
                   height: 60,
                   alignItems: 'center',
-                  margin: 5
+                  margin: 5,
                 }}>
                 <Avatar
                   medium
-                  rounded
                   onPress={() => this.toggleDevice(device.name)}
                   activeOpacity={0.7}
+                  
                 />
                 <Text style={{ fontSize: 9 }}>{device.name}</Text>
                 </View>

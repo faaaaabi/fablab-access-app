@@ -9,6 +9,7 @@ import {
     Linking,
     TextInput,
     ScrollView,
+    ActivityIndicator
 } from 'react-native';
 import NfcManager, {Ndef} from 'react-native-nfc-manager';
 import { Icon } from 'react-native-elements'
@@ -41,6 +42,7 @@ class NfcComponent extends Component {
             rtdType: RtdType.URL,
             parsedText: null,
             tag: {},
+            isAuthRequestPending: false,
         }
     }
 
@@ -61,23 +63,32 @@ class NfcComponent extends Component {
     }
 
     render() {
+        let { supported, enabled, tag, isWriting, urlToWrite, parsedText, rtdType, isAuthRequestPending } = this.state;
         return (
                 <View style={{ flex: 0.3, justifyContent: 'center', alignItems: 'center' }}>
                     {
                         <View style={{}}>
-                          {!this.props.authenticated ? (<Icon
-                            name='lock'
-                            type='evilicon'
-                            color='red'
-                            size={400}
-                            />) : 
-                            (<Icon
-                               name='unlock'
-                               type='evilicon'
-                               color='green'
-                               size={400}
-                             />)}
-          
+                            {!this.props.authenticated && !isAuthRequestPending &&
+                                <View>
+                                    <Icon
+                                        name='lock'
+                                        type='evilicon'
+                                        color='red'
+                                        size={200}
+                                    />
+                                    <Text style={{ fontSize: 9, textAlign: 'center', padding: 10 }}>Das Panel ist gesperrt. Bitte halten Sie Ihr Zugangsmedium an die markierte Stelle, um Zugriff zu erhalten.</Text>
+                                    <Text style={{ fontSize: 7, textAlign: 'center', padding: 10 }}>{`Debug: ${JSON.stringify(tag)}`}</Text>
+                                </View>
+                            }
+                            {this.props.authenticated && !isAuthRequestPending &&
+                                <Icon
+                                    name='unlock'
+                                    type='evilicon'
+                                    color='green'
+                                    size={200}
+                                />
+                             }
+                            { isAuthRequestPending && <ActivityIndicator size="large" color="#green" /> }
                         </View>
                     }
                 </View>
@@ -281,14 +292,23 @@ class NfcComponent extends Component {
     }
 
     _checkAccess = async (id) => {
-        const response = await fetch(`http://${this.props.host}/users/${id}/checkMachinePermission`);
-        const responseJSON = await response.json();
-        console.log('responseJson', responseJSON);
+        try {
+            this.setState({ isAuthRequestPending: true });
+            console.log('CheckAccess Call: ', `http://${this.props.host}/users/${id}/checkMachinePermission`)
+            const response = await fetch(`http://${this.props.host}/users/${id}/checkMachinePermission`);
+            const responseJSON = await response.json();
+            console.log('responseJson', responseJSON);
+            
 
-        if ( responseJSON.isAllowed ) {
-            this.props.onAuthenticated(true);
-        } else {
-            this.props.onAuthenticated(false);
+            if ( responseJSON.isAllowed ) {
+                this.props.onAuthenticated(true);
+            } else {
+                this.props.onAuthenticated(false);
+            }
+            this.setState({ isAuthRequestPending: false });
+        } catch (e) {
+            console.log('_checkAccess Error:', e)
+            this.setState({ isAuthRequestPending: false });
         }
     }
 
