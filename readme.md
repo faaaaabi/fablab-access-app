@@ -1,5 +1,5 @@
-# Fablab Api Gateway
-Api Gateway für die Zugriffsteuerung des Fablabs über Odoo und openHAB
+# Fablab Access App
+App zur Zugriffskontrolle von Geräten im Fabalb
 
 ## Usage
 
