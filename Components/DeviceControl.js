@@ -19,7 +19,8 @@ class DeviceControl extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      devices: [{name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}]
+      //devices: [{name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}, {name: 'teeeeeest1'}, {name: 'test2'}, {name: 'test3'}]
+      devices: []
     }
   }
 
@@ -27,7 +28,7 @@ class DeviceControl extends Component {
   }
 
   async componentDidMount() {
-    await this.fetchDevicesToState('Regal1');
+    await this.fetchDevicesAsLocationmapToState('Regal1');
   }
 
   render() {
@@ -41,6 +42,12 @@ class DeviceControl extends Component {
         justifyContent: 'flex-start',
         paddingTop:10
       }}>
+      <DeviceLocationView devices={this.state.devices} />
+      </View>
+    );
+  }
+
+  /*
         {this.state.devices.map(device =>
                 <View key={device.name} style={{
                   width: 60,
@@ -57,9 +64,7 @@ class DeviceControl extends Component {
                 <Text style={{ fontSize: 9 }}>{device.name}</Text>
                 </View>
         )}
-      </View>
-    );
-  }
+  */
 
   fetchDevicesToState = async (group) => {
     try {
@@ -70,12 +75,52 @@ class DeviceControl extends Component {
       console.error(e);
     }
   }
+
+  fetchDevicesAsLocationmapToState = async (group) => {
+    try {
+      const response = await fetch(`http://${this.props.host}/devices/${group}/members/locationmap`);
+      const devicesJSON = await response.json();
+      this.setState({ devices: devicesJSON.locationMap });
+    } catch (e) {
+      console.error(e);
+    }
+  }
 };
 
 toggleDevice = async (deviceName) => {
   if ( this.props.authenticated ) {
       fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`);
   }
+}
+
+DeviceLocationView = (props) => {
+  if(props.devices.length > 0) {
+    console.log('locationmap:' , props.devices)
+    return(
+      props.devices.map((row) => {
+        return (<View>
+          {row.map((element) => {
+            return(
+            <View 
+              style={{
+              width: 60,
+              height: 60,
+              alignItems: 'center',
+              margin: 5,
+            }}>
+              <Avatar
+                medium
+                onPress={() => this.toggleDevice(element.name)}
+                activeOpacity={0.7}
+              />
+            </View>
+            )
+          })}
+        </View>)
+      })  
+      );
+  }
+  return null;
 }
 
 const mapStateToProps = state => {

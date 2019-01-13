@@ -1,6 +1,6 @@
 const initialState = {
     authenticated: false,
-    host: '192.168.0.129:8089',
+    host: '10.0.2.1:8089',
     deviceName: null
 }
 
