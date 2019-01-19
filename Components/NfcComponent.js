@@ -74,7 +74,7 @@ class NfcComponent extends Component {
                                         name='lock'
                                         type='evilicon'
                                         color='red'
-                                        size={200}
+                                        size={400}
                                     />
                                     <Text style={{ fontSize: 9, textAlign: 'center', padding: 10 }}>Das Panel ist gesperrt. Bitte halten Sie Ihr Zugangsmedium an die markierte Stelle, um Zugriff zu erhalten.</Text>
                                     <Text style={{ fontSize: 7, textAlign: 'center', padding: 10 }}>{`Debug: ${JSON.stringify(tag)}`}</Text>
@@ -85,7 +85,7 @@ class NfcComponent extends Component {
                                     name='unlock'
                                     type='evilicon'
                                     color='green'
-                                    size={200}
+                                    size={400}
                                 />
                              }
                             { isAuthRequestPending && <ActivityIndicator size="large" color="#green" /> }

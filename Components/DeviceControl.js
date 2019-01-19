@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {
     AppRegistry,
     View,
+    FlatList,
     Text,
     Button,
     Platform,
@@ -28,26 +29,58 @@ class DeviceControl extends Component {
   }
 
   async componentDidMount() {
+    console.log('moped')
     await this.fetchDevicesAsLocationmapToState('Regal1');
   }
 
-  render() {
-    return (
-      // Try setting `justifyContent` to `center`.
-      // Try setting `flexDirection` to `row`.
-      <View style={{
-        flex: 0.7,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'flex-start',
-        paddingTop:10
-      }}>
-      <DeviceLocationView devices={this.state.devices} />
-      </View>
-    );
+  componentDidUpdate(){
+    console.log('update: ', this.props.devices);
   }
 
+  renderItem = (item) => {
+    console.log('renderItem item: ', item)
+    return(
+      <View style={{flexDirection: 'row',}}>
+        { item.map( (device) => {
+          const color = device ? 'grey' : 'white'
+          const backgroundColor = {backgroundColor: color}
+            return(
+              <View style={{margin: 10}}>
+                <Avatar
+                  xlarge
+                  overlayContainerStyle={backgroundColor}
+                  onPress={() => this.toggleDevice(device.name)}
+                  activeOpacity={0.7}
+                />
+                {device && <Text style={{ fontSize: 15 }}>{device.name}</Text>}
+              </View>
+            ) 
+          })
+        }
+      </View>
+    )
+    };
+
+render() {
+  return (
+    // Try setting `justifyContent` to `center`.
+    // Try setting `flexDirection` to `row`.
+    <View style={{
+      flex: 0.7,
+      paddingTop:10
+    }}>
+    <FlatList
+      data={this.state.devices}
+      renderItem={({item}) => this.renderItem(item)}
+    />
+    </View>
+  );
+}
+
+
   /*
+        <DeviceLocationView devices={this.state.devices} />
+
         {this.state.devices.map(device =>
                 <View key={device.name} style={{
                   width: 60,
@@ -122,6 +155,16 @@ DeviceLocationView = (props) => {
   }
   return null;
 }
+
+/*DeviceLocationViewList = (props) => {
+  if(props.devices.length > 0) {
+    console.log('locationmap:' , props.devices)
+    return(
+
+    );
+  }
+  return null;
+}*/
 
 const mapStateToProps = state => {
   return {
