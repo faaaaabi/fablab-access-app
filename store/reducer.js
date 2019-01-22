@@ -1,7 +1,8 @@
 const initialState = {
     authenticated: false,
-    host: '10.0.2.1:8089',
-    deviceName: null
+    host: '192.168.0.10:8083',
+    deviceName: null,
+    isConnected: null
 }
 
 const reducer = (state = initialState, action) => {
@@ -21,6 +22,11 @@ const reducer = (state = initialState, action) => {
         return {
             ...state,
             deviceName: action.value
+        }
+        case 'CONNECTION_STATE_CHANGED':
+        return {
+            ...state,
+            isConnected: action.value
         }
     }
     return state;
