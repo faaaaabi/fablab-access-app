@@ -58,7 +58,7 @@ export default class App extends Component<Props> {
           <ThemeContext.Provider value={getTheme(uiTheme)} style={{flex: 1}}>
           <Toolbar
             leftElement="menu"
-            centerElement="Fablab Control"
+            centerElement="Fablab sdf"
             searchable={{
             autoFocus: true,
             placeholder: 'Search',

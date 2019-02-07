@@ -1,3 +1,7 @@
+import { 
+    SET_TOKEN 
+  } from '../actions/actionTypes' 
+
 const initialState = {
   authenticated: false,
   apiKey: 'SuperStrongAPIKey',
@@ -12,7 +16,7 @@ const authReducer = (state = initialState, action) => {
               ...state,
               authenticated: action.value
           }
-      case 'TOKEN_RECEIVED':
+      case SET_TOKEN:
       return {
           ...state,
           token: action.value

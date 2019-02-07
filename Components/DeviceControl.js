@@ -3,11 +3,12 @@ import { FlatList, NetInfo, Text, View } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { connect } from 'react-redux';
 import SocketIOClient from 'socket.io-client';
-import { 
-  CONNECTION_STATE_CHANGED, 
-  TOKEN_RECEIVED 
-} from '../store/actions/actionTypes' 
-import requestApiAuthentication from '../store/actions/authActions';
+import {
+  CONNECTION_STATE_CHANGED,
+  TOKEN_RECEIVED
+} from '../store/actions/actionTypes'
+import { requestApiAuthentication } from '../store/actions/authActions';
+import { DeviceAvatar } from './Device/DeviceAvatar'
 
 class DeviceControl extends Component {
   constructor(props) {
@@ -18,7 +19,7 @@ class DeviceControl extends Component {
   }
 
   componentWillMount() {
-    
+
   }
 
   async componentDidMount() {
@@ -29,12 +30,9 @@ class DeviceControl extends Component {
       NetInfo.isConnected.addEventListener('connectionChange', dispatchConnected);
     });
 
-    await this.requestApiAuthentication();
+    await this.props.requestApiAuthentication();
     await this.fetchDevicesAsLocationmapToState('Regal1');
     this.doSocketConnection();
-  }
-
-  componentDidUpdate() {
   }
 
   keyExtractor = (item, index) => item.index;
@@ -42,18 +40,8 @@ class DeviceControl extends Component {
   renderItem = (item) => (
     <View key={item} style={{ flexDirection: 'row', }}>
       {item.reverse().map((device, index) => (
-        <View key={index} style={{ margin: 10 }}>
-          <Avatar
-            xlarge
-            overlayContainerStyle={{ backgroundColor: device ? 'grey' : 'white' }}
-            onPress={() => device ? this.toggleDevice(device.name) : ''}
-            activeOpacity={0.7}
-          />
-          {device && <Text style={{ fontSize: 15 }}>{device.name}</Text>}
-        </View>
-      )
-      )
-      }
+        <DeviceAvatar props={{ device, index }} />
+      ))}
     </View>
   )
 
@@ -70,19 +58,9 @@ class DeviceControl extends Component {
     );
   };
 
-  fetchDevicesToState = async (group) => {
-    try {
-      const response = await fetch(`http://${this.props.host}/devices/${group}/members`)
-      const responseJSON = await response.json();
-      this.setState({ devices: responseJSON.devices });
-    } catch (e) {
-      alert('Could not load devices. Check your network connection');
-      console.error(e);
-    }
-  }
-
   fetchDevicesAsLocationmapToState = async (group) => {
     /*if(this.props.isConnected) {*/
+      console.log('fetchingDEvices');
     try {
       const headers = new Headers();
       //headers.append('Content-Type', 'application/json');
@@ -122,26 +100,6 @@ class DeviceControl extends Component {
         alert('Could not change device state.');
       }
 
-    }
-  }
-
-  doAuthentication = async () => {
-    try {
-      const authResponse = await fetch(`http://${this.props.host}/auth/app`, {
-        method: 'POST',
-        headers: {
-          "content-type": "application/x-www-form-urlencoded"
-        },
-        body: `deviceID=AccessDevice1&apiKey=${this.props.apiKey}`
-      })
-      const authResponseJSON = await authResponse.json()
-      console.log('authresponse: ', authResponseJSON)
-      if (authResponseJSON) {
-        console.log("tüdelü");
-        this.props.onTokenReceived(authResponseJSON.token);
-      }
-    } catch (e) {
-      alert(e);
     }
   }
 
@@ -202,8 +160,10 @@ const mapStateToProps = state => {
   };
 }
 
-const mapDispatchToProps = {
-  requestApiAuthentication
+const mapDispatchToProps = dispatch => {
+  return {
+    requestApiAuthentication: () => dispatch(requestApiAuthentication())
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeviceControl)
