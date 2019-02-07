@@ -2,7 +2,8 @@ import {
   SET_TOKEN 
 } from './actionTypes' 
 
-export const requestApiAuthentication = () => {
+export const requestApiAuthentication = async () => {
+  console.log('auth action fried');
   return async (dispatch, getState) => {
     try {
       const { host, apiKey } = getState();
