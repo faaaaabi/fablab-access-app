@@ -12,7 +12,12 @@ import {
     ActivityIndicator
 } from 'react-native';
 import NfcManager, {Ndef} from 'react-native-nfc-manager';
-import { Icon } from 'react-native-elements'
+import { Icon } from 'react-native-elements';
+import { 
+    AUTHENTICATED, 
+    HOST_CHANGED, 
+    DEVICE_CHANGED, 
+} from '../store/actions/actionTypes' 
 
 const RtdType = {
     URL: 0,
@@ -330,15 +335,15 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         onAuthenticated: (value) => dispatch({
-            type: 'AUTHENTICATED',
+            type: AUTHENTICATED,
             value
         }),
         onHostChange: (value) => dispatch({
-            type: 'HOST_CHANGED',
+            type: HOST_CHANGED,
             value
         }),
         onDeviceChange: (value) => dispatch({
-            type: 'DEVICE_CHANGED',
+            type: DEVICE_CHANGED,
             value
         }),
     };

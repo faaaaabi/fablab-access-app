@@ -14,11 +14,12 @@ import NfcComponent from './Components/NfcComponent';
 import DeviceControl from './Components/DeviceControl';
 
 // Redux
-import { createStore } from 'redux';
-import reducer from './store/reducer'
-import { persistStore, persistReducer } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+import { createStore, applyMiddleware } from 'redux';
+import { rootReducer } from './store';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { PersistGate } from 'redux-persist/integration/react';
+import thunk from 'redux-thunk';
 
 
 // Store & Persistance
@@ -28,8 +29,11 @@ const persistConfig = {
   whitelist: ['host', 'deviceName']
 }
 
-const persistedReducer = persistReducer(persistConfig, reducer);
-const store = createStore(persistedReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+const store = createStore(
+  persistedReducer,
+  applyMiddleware(thunk)
+);
 const persistor = persistStore(store);
 
 // UI

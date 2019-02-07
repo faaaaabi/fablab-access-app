@@ -18,7 +18,9 @@
     "react-navigation": "^2.18.2",
     "react-redux": "^5.1.1",
     "redux": "^4.0.1",
-    "redux-persist": "^5.10.0"
+    "redux-persist": "^5.10.0",
+    "redux-thunk": "^2.3.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "babel-jest": "23.6.0",
