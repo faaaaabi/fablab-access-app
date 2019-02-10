@@ -9,6 +9,8 @@ import {
 } from '../store/actions/actionTypes'
 import { requestApiAuthentication } from '../store/actions/authActions';
 import { DeviceAvatar } from './Device/DeviceAvatar'
+import { Separator } from './Device/Separator'
+import { getDevicesAsLocationMap } from '../services/deviceService'
 
 class DeviceControl extends Component {
   constructor(props) {
@@ -18,12 +20,7 @@ class DeviceControl extends Component {
     }
   }
 
-  componentWillMount() {
-
-  }
-
   async componentDidMount() {
-    console.log('moped')
     const dispatchConnected = isConnected => this.props.onConnectionChanged(isConnected);
 
     NetInfo.isConnected.fetch().then().done(() => {
@@ -40,55 +37,18 @@ class DeviceControl extends Component {
   renderItem = (item) => (
     <View key={item} style={{ flexDirection: 'row', }}>
       {item.reverse().map((device, index) => (
-        <DeviceAvatar props={{ device, index }} />
+        <DeviceAvatar device={device} key={index} />
       ))}
     </View>
   )
 
-  renderSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "86%",
-          backgroundColor: "#CED0CE",
-          marginLeft: "1%"
-        }}
-      />
-    );
-  };
-
   fetchDevicesAsLocationmapToState = async (group) => {
-    /*if(this.props.isConnected) {*/
-      console.log('fetchingDEvices');
+    console.log('fetching devices');
     try {
-      const headers = new Headers();
-      //headers.append('Content-Type', 'application/json');
-      headers.set('Authorization', `Bearer ${this.props.token}`);
-      console.log('token:', this.props.token);
-
-      const response = await fetch(`http://${this.props.host}/devices/${group}/members/locationmap`, {
-        method: 'GET',
-        headers
-      });
-      if (response.status > 299) {
-        alert(`Error fetching devices. Statuscode: ${response.status}`)
-      } else {
-        try {
-          const responseText = await response.text();
-          const responseJSON = JSON.parse(responseText);
-          if (!responseJSON.error || !response.status > 299) {
-            this.setState({ devices: responseJSON.locationMap });
-          }
-          else {
-            alert(`Error fetching devicemap: ${responseJSON.error}, Status-Code: ${response.status}`)
-          }
-        } catch (e) {
-          alert(e);
-        }
-      }
+      const deviceLocationMap = await getDevicesAsLocationMap(this.props.token, this.props.host, group);
+      this.setState({ devices: deviceLocationMap });
     } catch (e) {
-      alert('Could not load devices. Check your network connection');
+      alert(e);
     }
   }
 
@@ -99,7 +59,6 @@ class DeviceControl extends Component {
       } catch (e) {
         alert('Could not change device state.');
       }
-
     }
   }
 
@@ -120,7 +79,7 @@ class DeviceControl extends Component {
           //do other things
         })
         .on('unauthorized', function (msg) {
-          console.log("unauthorized: " + JSON.stringify(msg.data));
+  
           alert(`Error connection to realtime API: ${msg.data.type}`);
         })
     });
@@ -129,18 +88,17 @@ class DeviceControl extends Component {
 
   render() {
     return (
-      // Try setting `justifyContent` to `center`.
-      // Try setting `flexDirection` to `row`.
       <View style={{
         flex: 0.7,
         paddingTop: 10
       }}>
         {this.state.devices &&
           <FlatList
+            key={1}
             data={this.state.devices.reverse()}
             renderItem={({ item }) => this.renderItem(item)}
-            keyExtractor={this.keyExtractor}
-            ItemSeparatorComponent={this.renderSeparator}
+            keyExtractor={(item, index) => index.toString()}
+            ItemSeparatorComponent={Separator}
           />
         }
       </View>
@@ -152,19 +110,17 @@ class DeviceControl extends Component {
 
 const mapStateToProps = state => {
   return {
-    authenticated: state.authenticated,
-    host: state.host,
-    isConnected: state.isConnected,
-    apiKey: state.apiKey,
-    token: state.token,
+    authenticated: state.auth.authenticated,
+    host: state.settings.host,
+    isConnected: state.status.isConnected,
+    apiKey: state.auth.apiKey,
+    token: state.auth.token,
   };
 }
 
-const mapDispatchToProps = dispatch => {
-  return {
-    requestApiAuthentication: () => dispatch(requestApiAuthentication())
-  }
+const actions = {
+  requestApiAuthentication,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(DeviceControl)
+export default connect(mapStateToProps, actions)(DeviceControl)
 

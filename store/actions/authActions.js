@@ -13,13 +13,11 @@ export const requestApiAuthentication = () => {
         },
         body: `deviceID=AccessDevice1&apiKey=${auth.apiKey}`
       })
-      const authResponseJSON = await authResponse.json()
-      if (authResponseJSON) {
-        dispatch({
-          type: SET_TOKEN,
-          value: authResponseJSON.token
-        })
-      }
+      const authResponseJSON = await authResponse.json();
+      dispatch({
+        type: SET_TOKEN,
+        value: authResponseJSON.token
+      })
     } catch (e) {
       alert(e);
     }
