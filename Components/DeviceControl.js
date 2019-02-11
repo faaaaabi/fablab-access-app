@@ -37,7 +37,7 @@ class DeviceControl extends Component {
   renderItem = (item) => (
     <View key={item} style={{ flexDirection: 'row', }}>
       {item.reverse().map((device, index) => (
-        <DeviceAvatar device={device} key={index} />
+        <DeviceAvatar device={device} toggleFunction={this.toggleDevice} key={index} />
       ))}
     </View>
   )
@@ -53,9 +53,14 @@ class DeviceControl extends Component {
   }
 
   toggleDevice = async (deviceName) => {
+    const headers = new Headers();
+    headers.set('Authorization', `Bearer ${this.props.token}`);
     if (this.props.authenticated) {
       try {
-        fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`);
+        fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`, {
+          method: 'GET',
+          headers
+      });
       } catch (e) {
         alert('Could not change device state.');
       }
@@ -79,7 +84,7 @@ class DeviceControl extends Component {
           //do other things
         })
         .on('unauthorized', function (msg) {
-  
+
           alert(`Error connection to realtime API: ${msg.data.type}`);
         })
     });

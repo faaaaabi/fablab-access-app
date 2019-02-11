@@ -299,10 +299,14 @@ class NfcComponent extends Component {
     _checkAccess = async (id) => {
         try {
             this.setState({ isAuthRequestPending: true });
-            console.log('CheckAccess Call: ', `http://${this.props.host}/users/${id}/checkMachinePermission`)
-            const response = await fetch(`http://${this.props.host}/users/${id}/checkMachinePermission`);
+            const headers = new Headers();
+            headers.set('Authorization', `Bearer ${this.props.token}`);
+            const response = await fetch(`http://${this.props.host}/users/${id}/checkMachinePermission`,
+            {
+                method: 'GET',
+                headers
+            });
             const responseJSON = await response.json();
-            console.log('responseJson', responseJSON);
             
 
             if ( responseJSON.isAllowed ) {
@@ -326,9 +330,10 @@ class NfcComponent extends Component {
 
 const mapStateToProps = state => {
     return {
-        authenticated: state.authenticated,
-        host: state.host,
-        deviceName: state.deviceName
+        token: state.auth.token,
+        authenticated: state.auth.authenticated,
+        host: state.settings.host,
+        deviceName: state.settings.deviceName
     };
 }
 
