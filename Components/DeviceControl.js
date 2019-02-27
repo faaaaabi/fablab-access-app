@@ -8,8 +8,8 @@ import {
   TOKEN_RECEIVED
 } from '../store/actions/actionTypes'
 import { requestApiAuthentication } from '../store/actions/authActions';
-import { DeviceAvatar } from './Device/DeviceAvatar'
-import { Separator } from './Device/Separator'
+import { DeviceRow } from './Device/DeviceRow';
+import { Separator } from './Device/Separator';
 import { getDevicesAsLocationMap } from '../services/deviceService'
 
 class DeviceControl extends Component {
@@ -31,16 +31,6 @@ class DeviceControl extends Component {
     await this.fetchDevicesAsLocationmapToState('Regal1');
     this.doSocketConnection();
   }
-
-  keyExtractor = (item, index) => item.index;
-
-  renderItem = (item) => (
-    <View key={item} style={{ flexDirection: 'row', }}>
-      {item.reverse().map((device, index) => (
-        <DeviceAvatar device={device} toggleFunction={this.toggleDevice} key={index} />
-      ))}
-    </View>
-  )
 
   fetchDevicesAsLocationmapToState = async (group) => {
     console.log('fetching devices');
@@ -101,7 +91,7 @@ class DeviceControl extends Component {
           <FlatList
             key={1}
             data={this.state.devices.reverse()}
-            renderItem={({ item }) => this.renderItem(item)}
+            renderItem={({ item }) => DeviceRow}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={Separator}
           />
