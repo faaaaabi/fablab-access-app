@@ -8,8 +8,8 @@ import {
   TOKEN_RECEIVED
 } from '../store/actions/actionTypes'
 import { requestApiAuthentication } from '../store/actions/authActions';
-import { DeviceRow } from './Device/DeviceRow';
 import { Separator } from './Device/Separator';
+import { DeviceAvatar } from './Device/DeviceAvatar';
 import { getDevicesAsLocationMap } from '../services/deviceService'
 
 class DeviceControl extends Component {
@@ -81,17 +81,26 @@ class DeviceControl extends Component {
     this.socket.on('message', this.onReceivedMessage);
   }
 
+  DeviceRow = (item) => (
+    <View key={item} style={{ flexDirection: 'row', }}>
+      {item.reverse().map((device, index) => (
+        <DeviceAvatar device={device} toggleFunction={this.toggleDevice} key={index} />
+      ))}
+    </View>
+  )
+
   render() {
     return (
       <View style={{
         flex: 0.7,
-        paddingTop: 10
+        paddingTop: 10,
+        backgroundColor: '#CCCCCC'
       }}>
         {this.state.devices &&
           <FlatList
             key={1}
             data={this.state.devices.reverse()}
-            renderItem={({ item }) => DeviceRow}
+            renderItem={({ item }) => this.DeviceRow(item)}
             keyExtractor={(item, index) => index.toString()}
             ItemSeparatorComponent={Separator}
           />
