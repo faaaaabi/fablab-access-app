@@ -4,6 +4,7 @@ import {
 
 const initialState = {
   authenticated: false,
+  userUID: null,
   apiKey: 'SuperStrongAPIKey',
   token: null,
 }
@@ -13,7 +14,8 @@ const authReducer = (state = initialState, action) => {
       case 'AUTHENTICATED':
           return {
               ...state,
-              authenticated: action.value
+              authenticated: action.value.authenticated,
+              userUID: action.value.userUID,
           }
       case SET_TOKEN:
       return {

@@ -200,15 +200,6 @@ class NfcComponent extends Component {
   _onTagDiscovered = tag => {
     console.log("Tag Discovered", tag);
     this.setState({ tag });
-    let url = this._parseUri(tag);
-    if (url) {
-      Linking.openURL(url).catch(err => {
-        console.warn(err);
-      });
-    }
-
-    let text = this._parseText(tag);
-    this.setState({ parsedText: text });
     this._checkAccess(tag.id);
   };
 
@@ -248,28 +239,6 @@ class NfcComponent extends Component {
     }
   };
 
-  _parseUri = tag => {
-    try {
-      if (Ndef.isType(tag.ndefMessage[0], Ndef.TNF_WELL_KNOWN, Ndef.RTD_URI)) {
-        return Ndef.uri.decodePayload(tag.ndefMessage[0].payload);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return null;
-  };
-
-  _parseText = tag => {
-    try {
-      if (Ndef.isType(tag.ndefMessage[0], Ndef.TNF_WELL_KNOWN, Ndef.RTD_TEXT)) {
-        return Ndef.text.decodePayload(tag.ndefMessage[0].payload);
-      }
-    } catch (e) {
-      console.log(e);
-    }
-    return null;
-  };
-
   _checkAccess = async id => {
     try {
       this.setState({ isAuthRequestPending: true });
@@ -283,18 +252,28 @@ class NfcComponent extends Component {
         }
       );
       const responseJSON = await response.json();
-
-      if (responseJSON.isAllowed) {
-        this.props.onAuthenticated(true);
-      } else {
-        this.props.onAuthenticated(false);
-      }
+    if (response.status < 400) {
+        if (responseJSON.isAllowed) {
+          this.props.onAuthenticated({authenticated: true, userUID: id});
+          this.authPeriodTimer(5000);
+        }
+    } else if (response.status === 401 || response.status === 403) {
+        alert('Access Denied')
+    } else {
+        alert('Error checking access. Status code: ' + response.status);
+    }
       this.setState({ isAuthRequestPending: false });
     } catch (e) {
-      console.log("_checkAccess Error:", e);
+      alert('Error checking access. Error: ' + e);
       this.setState({ isAuthRequestPending: false });
     }
   };
+
+  authPeriodTimer = time => {
+      setTimeout(() => {
+          this.props.onAuthenticated({authenticated: false, userUID: false})
+      }, time);
+  }
 
   _toggleDevice = async deviceName => {
     if (this.props.authenticated) {

@@ -4,7 +4,7 @@ buildscript {
     ext {
         buildToolsVersion = "27.0.3"
         minSdkVersion = 16
-        compileSdkVersion = 27
+        compileSdkVersion = 28
         targetSdkVersion = 26
         supportLibVersion = "27.1.1"
     }
@@ -21,6 +21,8 @@ buildscript {
 }
 
 allprojects {
+        // force libs to use recent buildtools
+    // https://github.com/luggit/react-native-config/issues/299
     repositories {
         google()
         mavenLocal()
