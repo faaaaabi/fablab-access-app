@@ -86,27 +86,50 @@ class DeviceControl extends Component {
     }
   };
 
+  bookDevice = async deviceName => {
+    const headers = new Headers();
+    headers.set("Authorization", `Bearer ${this.props.token}`);
+    headers.set("Accept", "application/json");
+    headers.set("Content-Type", "application/json");
+    if (this.props.authenticated) {
+      try {
+        fetch(`http://${this.props.host}/bookings/`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({deviceName: deviceName, userUID: this.props.userUID})
+        });
+      } catch (e) {
+        alert(`Could not book device. Error: ${e}`);
+      }
+    }
+  }
+
   doSocketConnection = () => {
     const connectionConfig = {
       jsonp: false,
       reconnection: true,
       reconnectionDelay: 100,
       reconnectionAttempts: 100000,
-      transports: ["websocket"] // you need to explicitly tell it to use websockets
+      transports: ["websocket"], // you need to explicitly tell it to use websockets
+      forceNew: true,
     };
 
-    this.socket = SocketIOClient("http://192.168.0.10:8000", connectionConfig);
-    this.socket.on("connect", () => {
-      this.socket
-        .emit("authenticate", { token: this.props.token }) //send the jwt
-        .on("authenticated", function() {
-          //do other things
-        })
-        .on("unauthorized", function(msg) {
-          alert(`Error connection to realtime API: ${msg.data.type}`);
-        });
-    });
-    this.socket.on("message", this.onReceivedMessage);
+    let advertisementInvocations = 0;
+
+    const socket = SocketIOClient("http://192.168.0.10:8000", connectionConfig);
+    socket.on("connect", () => {
+      console.log('!! on connect called !!');
+      socket.emit("authenticate", { token: this.props.token }) //send the jwt
+      .on("authenticated", () => {
+        console.log('!! on authenticated called !!');
+        socket.emit('advertise', {accessDeviceName: 'TestAccessDevice1', location: 'Regal1', invocations: advertisementInvocations})
+        advertisementInvocations += 1;
+      })
+      .on("unauthorized", (msg) => {
+        alert(`Error connection to realtime API: ${msg.data.type}`);
+      });
+    })
+
   };
 
   DeviceRow = item => {
@@ -120,7 +143,7 @@ class DeviceControl extends Component {
           <DeviceAvatar
             avatarSize={AvatarSize}
             device={device}
-            toggleFunction={this.toggleDevice}
+            toggleFunction={this.bookDevice}
             key={index}
           />
         ))}

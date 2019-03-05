@@ -255,7 +255,7 @@ class NfcComponent extends Component {
     if (response.status < 400) {
         if (responseJSON.isAllowed) {
           this.props.onAuthenticated({authenticated: true, userUID: id});
-          this.authPeriodTimer(5000);
+          this.authPeriodTimer(20000);
         }
     } else if (response.status === 401 || response.status === 403) {
         alert('Access Denied')
