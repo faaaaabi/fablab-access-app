@@ -9,7 +9,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import NfcManager, { Ndef } from "react-native-nfc-manager";
-import { Icon } from "react-native-elements";
+import { Icon, Button } from "react-native-elements";
 import {
   AUTHENTICATED,
   HOST_CHANGED,
@@ -96,6 +96,7 @@ class NfcComponent extends Component {
             {isAuthRequestPending && (
               <ActivityIndicator size="large" color="#green" />
             )}
+            <Button title="Simulate NFC Tag" onPress={() => {this._onTagDiscovered({id: '9D909C1E'})}}></Button>
           </View>
         }
       </View>

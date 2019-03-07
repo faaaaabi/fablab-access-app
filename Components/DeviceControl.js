@@ -11,6 +11,7 @@ import { requestApiAuthentication } from "../store/actions/authActions";
 import { Separator } from "./Device/Separator";
 import { DeviceAvatar } from "./Device/DeviceAvatar";
 import { getDevicesAsLocationMap } from "../services/deviceService";
+const { Url, URLSearchParams } = require('url'); 
 
 class DeviceControl extends Component {
   constructor(props) {
@@ -51,6 +52,7 @@ class DeviceControl extends Component {
 
     await this.props.requestApiAuthentication();
     await this.fetchDevicesAsLocationmapToState("Regal1");
+    await this.fetchDeviceBookings();
     this.doSocketConnection();
   }
 
@@ -68,6 +70,32 @@ class DeviceControl extends Component {
     }
   };
 
+  fetchDeviceBookings = async () => {
+    console.log("fetching bookings");
+    try {
+      const headers = new Headers();
+      headers.set("Authorization", `Bearer ${this.props.token}`);
+      headers.set("Accept", "application/json");
+      headers.set("Content-Type", "application/json");
+      try {
+        var url = new Url(`http://${this.props.host}/bookings/`);
+        var params = ['device1', 'device2', 'device3'];
+        url.search = new URLSearchParams(params);
+        console.log('url-get:', url);
+        fetch(url, {
+          method: "GET",
+          headers,
+          body: JSON.stringify({ userUID: this.props.userUID })
+        });
+      } catch (e) {
+        alert("Could not get device bookings");
+        console.log(e);
+      }
+    } catch (e) {
+      alert(e);
+    }
+  };
+
   toggleDevice = async deviceName => {
     const headers = new Headers();
     headers.set("Authorization", `Bearer ${this.props.token}`);
@@ -78,7 +106,7 @@ class DeviceControl extends Component {
         fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`, {
           method: "POST",
           headers,
-          body: JSON.stringify({userUID: this.props.userUID})
+          body: JSON.stringify({ userUID: this.props.userUID })
         });
       } catch (e) {
         alert("Could not change device state.");
@@ -96,13 +124,16 @@ class DeviceControl extends Component {
         fetch(`http://${this.props.host}/bookings/`, {
           method: "POST",
           headers,
-          body: JSON.stringify({deviceName: deviceName, userUID: this.props.userUID})
+          body: JSON.stringify({
+            deviceName: deviceName,
+            userUID: this.props.userUID
+          })
         });
       } catch (e) {
         alert(`Could not book device. Error: ${e}`);
       }
     }
-  }
+  };
 
   doSocketConnection = () => {
     const connectionConfig = {
@@ -111,35 +142,36 @@ class DeviceControl extends Component {
       reconnectionDelay: 100,
       reconnectionAttempts: 100000,
       transports: ["websocket"], // you need to explicitly tell it to use websockets
-      forceNew: true,
+      forceNew: true
     };
 
     let advertisementInvocations = 0;
 
     const socket = SocketIOClient("http://192.168.0.10:8000", connectionConfig);
     socket.on("connect", () => {
-      console.log('!! on connect called !!');
-      socket.emit("authenticate", { token: this.props.token }) //send the jwt
-      .on("authenticated", () => {
-        console.log('!! on authenticated called !!');
-        socket.emit('advertise', {accessDeviceName: 'TestAccessDevice1', location: 'Regal1', invocations: advertisementInvocations})
-        advertisementInvocations += 1;
-      })
-      .on("unauthorized", (msg) => {
-        alert(`Error connection to realtime API: ${msg.data.type}`);
-      });
-    })
-
+      console.log("!! on connect called !!");
+      socket
+        .emit("authenticate", { token: this.props.token }) //send the jwt
+        .on("authenticated", () => {
+          console.log("!! on authenticated called !!");
+          socket.emit("advertise", {
+            accessDeviceName: "TestAccessDevice1",
+            location: "Regal1",
+            invocations: advertisementInvocations
+          });
+          advertisementInvocations += 1;
+        })
+        .on("unauthorized", msg => {
+          alert(`Error connection to realtime API: ${msg.data.type}`);
+        });
+    });
   };
 
   DeviceRow = item => {
     const AvatarSize = parseInt(this.state.width / 6);
     return (
-      <View
-        key={item}
-        style={{ flexDirection: "row" }}
-      >
-        {item.reverse().map((device, index) => (
+      <View key={item} style={{ flexDirection: "row" }}>
+        {item.map((device, index) => (
           <DeviceAvatar
             avatarSize={AvatarSize}
             device={device}
@@ -163,7 +195,7 @@ class DeviceControl extends Component {
           backgroundColor: "#CCCCCC"
         }}
       >
-        {this.state.devices && (
+        {reversedDevices && (
           <FlatList
             onLayout={event => this.measureView(event)}
             key={1}
