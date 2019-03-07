@@ -11,7 +11,14 @@ import { requestApiAuthentication } from "../store/actions/authActions";
 import { Separator } from "./Device/Separator";
 import { DeviceAvatar } from "./Device/DeviceAvatar";
 import { getDevicesAsLocationMap } from "../services/deviceService";
-const { Url, URLSearchParams } = require('url'); 
+// see https://github.com/facebook/react-native/issues/14796
+import { Buffer } from "buffer";
+global.Buffer = Buffer;
+
+// see https://github.com/facebook/react-native/issues/16434
+import { URL, URLSearchParams } from "whatwg-url";
+global.URL = URL;
+global.URLSearchParams = URLSearchParams;
 
 class DeviceControl extends Component {
   constructor(props) {
@@ -78,15 +85,14 @@ class DeviceControl extends Component {
       headers.set("Accept", "application/json");
       headers.set("Content-Type", "application/json");
       try {
-        var url = new Url(`http://${this.props.host}/bookings/`);
-        var params = ['device1', 'device2', 'device3'];
-        url.search = new URLSearchParams(params);
-        console.log('url-get:', url);
-        fetch(url, {
+        var url = new URL(`http://${this.props.host}/bookings/`);
+        var params = {ids: ['3D_Drucker_2', '3D_Drucker_3']};
+        url.search = new URLSearchParams(params)
+        const request = await fetch(url, {
           method: "GET",
           headers,
-          body: JSON.stringify({ userUID: this.props.userUID })
         });
+        const deviceBookings = await request.json();
       } catch (e) {
         alert("Could not get device bookings");
         console.log(e);
@@ -147,7 +153,7 @@ class DeviceControl extends Component {
 
     let advertisementInvocations = 0;
 
-    const socket = SocketIOClient("http://192.168.0.10:8000", connectionConfig);
+    const socket = SocketIOClient("http://192.168.122.1:8000", connectionConfig);
     socket.on("connect", () => {
       console.log("!! on connect called !!");
       socket

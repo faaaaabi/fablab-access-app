@@ -1,5 +1,5 @@
 const initialState = {
-  host: '82.116.117.161:8089',
+  host: '192.168.122.1:8083',
   deviceName: null,
 }
 
