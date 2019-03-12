@@ -84,19 +84,29 @@ class NfcComponent extends Component {
             {!this.props.authenticated && !isAuthRequestPending && (
               <View>
                 <View style={styles.circle}>
-                  <Icon name="lock" type="evilicon" color="#4f4f4f" size={250} />
+                  <Icon
+                    name="lock"
+                    type="evilicon"
+                    color="#f7f7f7"
+                    size={250}
+                  />
                 </View>
               </View>
             )}
             {this.props.authenticated && !isAuthRequestPending && (
               <View style={styles.circle}>
-                <Icon name="unlock" type="evilicon" color="#C3C3C3" size={250} />
+                <Icon name="unlock" type="evilicon" color="#FFF" size={250} />
               </View>
             )}
             {isAuthRequestPending && (
               <ActivityIndicator size="large" color="#green" />
             )}
-            <Button title="Simulate NFC Tag" onPress={() => {this._onTagDiscovered({id: '9D909C1E'})}}></Button>
+            <Button
+              title="Simulate NFC Tag"
+              onPress={() => {
+                this._onTagDiscovered({ id: "6B26F733" });
+              }}
+            />
           </View>
         }
       </View>
@@ -201,7 +211,7 @@ class NfcComponent extends Component {
   _onTagDiscovered = tag => {
     console.log("Tag Discovered", tag);
     this.setState({ tag });
-    this._checkAccess(tag.id);
+    this._requestIntermediateToken(tag.id);
   };
 
   _startDetection = () => {
@@ -240,41 +250,40 @@ class NfcComponent extends Component {
     }
   };
 
-  _checkAccess = async id => {
+  _requestIntermediateToken = async userUID => {
     try {
       this.setState({ isAuthRequestPending: true });
       const headers = new Headers();
       headers.set("Authorization", `Bearer ${this.props.token}`);
-      const response = await fetch(
-        `http://${this.props.host}/users/${id}/checkMachinePermission`,
-        {
-          method: "GET",
-          headers
-        }
-      );
+      headers.set("content-type", "application/x-www-form-urlencoded");
+      const response = await fetch(`http://${this.props.host}/auth/user`, {
+        method: "POST",
+        headers,
+        body: `rfiduuid=${userUID}&apiKey=${this.props.apiKey}`
+      });
       const responseJSON = await response.json();
-    if (response.status < 400) {
-        if (responseJSON.isAllowed) {
-          this.props.onAuthenticated({authenticated: true, userUID: id});
+      if (response.status < 400) {
+        if (responseJSON.token) {
+          this.props.onAuthenticated({ authenticated: true, userUID: userUID, intermediateToken: responseJSON.token });
           this.authPeriodTimer(20000);
         }
-    } else if (response.status === 401 || response.status === 403) {
-        alert('Access Denied')
-    } else {
-        alert('Error checking access. Status code: ' + response.status);
-    }
+      } else if (response.status === 401 || response.status === 403) {
+        alert("Access Denied");
+      } else {
+        alert("Error checking access. Status code: " + response.status);
+      }
       this.setState({ isAuthRequestPending: false });
     } catch (e) {
-      alert('Error checking access. Error: ' + e);
+      alert("Error checking access. Error: " + e);
       this.setState({ isAuthRequestPending: false });
     }
   };
 
   authPeriodTimer = time => {
-      setTimeout(() => {
-          this.props.onAuthenticated({authenticated: false, userUID: false})
-      }, time);
-  }
+    setTimeout(() => {
+      this.props.onAuthenticated({ authenticated: false, userUID: null, intermediateToken: null});
+    }, time);
+  };
 
   _toggleDevice = async deviceName => {
     if (this.props.authenticated) {
@@ -288,7 +297,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     borderRadius: 250 / 2,
-    backgroundColor: "grey",
+    backgroundColor: "#BDBDBD",
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
@@ -296,7 +305,7 @@ const styles = StyleSheet.create({
     shadowRadius: 16.0,
     elevation: 24,
     borderWidth: 6,
-    borderColor: '#4f4f4f',
+    borderColor: "#727272"
   }
 });
 
@@ -305,6 +314,7 @@ const mapStateToProps = state => {
     token: state.auth.token,
     authenticated: state.auth.authenticated,
     host: state.settings.host,
+    apiKey: state.auth.apiKey,
     deviceName: state.settings.deviceName
   };
 };

@@ -45,7 +45,7 @@ const persistor = persistStore(store);
 // UI
 const uiTheme = {
   palette: {
-    primaryColor: COLOR.green500,
+    primaryColor: '#5F9569',
   },
   toolbar: {
     container: {
