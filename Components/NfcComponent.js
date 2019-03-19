@@ -259,7 +259,7 @@ class NfcComponent extends Component {
       const response = await fetch(`http://${this.props.host}/auth/user`, {
         method: "POST",
         headers,
-        body: `rfiduuid=${userUID}&apiKey=${this.props.apiKey}`
+        body: `userID=${userUID}&apiKey=${this.props.apiKey}`
       });
       const responseJSON = await response.json();
       if (response.status < 400) {

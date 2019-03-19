@@ -1,23 +1,21 @@
 import React, { Component } from "react";
 import { FlatList, NetInfo, View, Text, Alert } from "react-native";
-import { Avatar } from "react-native-elements";
 import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
-import {
-  CONNECTION_STATE_CHANGED,
-  TOKEN_RECEIVED
-} from "../store/actions/actionTypes";
 import { requestApiAuthentication } from "../store/actions/authActions";
-import { Separator } from "./Device/Separator";
 import { DeviceAvatar } from "./Device/DeviceAvatar";
 import { getDevicesAsLocationMap } from "../services/deviceService";
+import {
+  fetchDeviceBookings,
+  startBooking,
+  endBooking
+} from "../services/bookingService";
 // see https://github.com/facebook/react-native/issues/14796
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
 
 // see https://github.com/facebook/react-native/issues/16434
 import { URL, URLSearchParams } from "whatwg-url";
-import { extendDevicesObjectWithBookings } from "../libs/extendDevicesObjectWithBookings";
 global.URL = URL;
 global.URLSearchParams = URLSearchParams;
 
@@ -83,87 +81,59 @@ class DeviceControl extends Component {
   };
 
   fetchDeviceBookings = async () => {
-    console.log("fetching bookings");
     try {
-      const headers = new Headers();
-      headers.set("Authorization", `Bearer ${this.props.token}`);
-      headers.set("Accept", "application/json");
-      headers.set("Content-Type", "application/json");
-      try {
-        var url = new URL(`http://${this.props.host}/bookings/`);
-        const devicesArray = [];
-        this.state.devices.forEach(row => {
-          row.forEach(element => {
-            if(element) {
-              devicesArray.push(element);
-            }
-          })
-        })
-
-        var params = { ids: devicesArray.map((device) => {
-          return device.name
-        }) };
-
-        url.search = new URLSearchParams(params);
-        const request = await fetch(url, {
-          method: "GET",
-          headers
-        });
-        const deviceBookings = await request.json();
-        this.setState({ deviceBookings });
-      } catch (e) {
-        alert("Could not get device bookings");
-        console.log(e);
-      }
+      const deviceBookings = await fetchDeviceBookings(
+        this.state.devices,
+        this.props.token,
+        this.props.host
+      );
+      this.setState({ deviceBookings });
     } catch (e) {
       alert(e);
     }
   };
 
   bookDevice = async deviceName => {
-    const headers = new Headers();
-    headers.set("Authorization", `Bearer ${this.props.token}`);
-    headers.set("Accept", "application/json");
-    headers.set("Content-Type", "application/json");
-    if (this.props.authenticated) {
-      /*if(this.isDeviceBooked(deviceName)) {
-        const booker = this.getBooker(deviceName, this.state.deviceBookings)
-        if(booker.userUID === this.props.userUID) {
-          const response = await fetch(`http://${this.props.host}/bookings/`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            deviceName: deviceName,
-            userUID: this.props.userUID
-          })
-        });
-        }
-      }*/
-      try {
-        console.log('intermadiate token:', this.props.intermediateToken);
-        const response = await fetch(`http://${this.props.host}/bookings/`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            deviceName: deviceName,
-            userUID: this.props.userUID,
-            intermediateToken: this.props.intermediateToken
-          })
-        });
-        if (!response.ok) {
-          const responeJSON = await response.json();
+    const booking = this.findBooking(deviceName, this.state.deviceBookings);
+
+    if (!this.props.authenticated) {
+      Alert.alert("Action forbidden", "You are not authenticated");
+      return;
+    }
+
+    try {
+      if (booking) {
+        if (booking.userUID !== this.props.userUID) {
           Alert.alert(
-            "Booking Error",
-            `There was an error booking this device. Error: ${
-              responeJSON.error
-            }`
+            "Action forbidden",
+            "You are not the owner of this booking"
           );
-        } else {
-          this.fetchDeviceBookings();
+          return;
         }
-      } catch (e) {
-        alert(`Could not book device. Error: ${e}`);
+
+        const isDeviceBooked = await endBooking(
+          deviceName,
+          this.props.userUID,
+          booking,
+          this.props.token,
+          this.props.intermediateToken,
+          this.props.host
+        );
+        this.fetchDeviceBookings();
+
+        return;
       }
+
+      await startBooking(
+        deviceName,
+        this.props.userUID,
+        this.props.token,
+        this.props.intermediateToken,
+        this.props.host
+      );
+      this.fetchDeviceBookings();
+    } catch (e) {
+      Alert.alert("Booking Error", `Following error occured: ${e}`);
     }
   };
 
@@ -227,9 +197,7 @@ class DeviceControl extends Component {
             transform: [{ rotate: "-90deg" }]
           }}
         >
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            Fach {index}
-          </Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>Fach {index}</Text>
         </View>
         <View style={{ flex: 0.9, flexDirection: "row" }}>
           {item.map((device, index) => (
@@ -252,11 +220,11 @@ class DeviceControl extends Component {
     });
   };
 
-  getBooker = (devicName, bookings) => {
+  findBooking = (devicName, bookings) => {
     return this.state.deviceBookings.find(booking => {
-      return booking.deviceName === devicName 
-    })
-  }
+      return booking.deviceName === devicName;
+    });
+  };
 
   render() {
     const reversedDevices = this.state.devices.slice();
