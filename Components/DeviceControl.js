@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import SocketIOClient from "socket.io-client";
 import { requestApiAuthentication } from "../store/actions/authActions";
 import { DeviceAvatar } from "./Device/DeviceAvatar";
-import { getDevicesAsLocationMap } from "../services/deviceService";
+import { getPlace, getDevicesAsLocationMap } from "../services/deviceService";
 import {
   fetchDeviceBookings,
   startBooking,
@@ -14,17 +14,13 @@ import {
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
 
-// see https://github.com/facebook/react-native/issues/16434
-import { URL, URLSearchParams } from "whatwg-url";
-global.URL = URL;
-global.URLSearchParams = URLSearchParams;
-
 class DeviceControl extends Component {
   constructor(props) {
     super(props);
     this.state = {
       devices: [],
       deviceBookings: [],
+      place: {},
       x: "",
       y: "",
       width: "",
@@ -57,24 +53,36 @@ class DeviceControl extends Component {
       });
 
     await this.props.requestApiAuthentication();
-    await this.fetchDevicesAsLocationmapToState("Regal1");
+    await this.fetchPlace("5c988aefdb62b50007f2340a");
+    await this.fetchDevicesAsLocationmapToState();
     await this.fetchDeviceBookings();
     /*setInterval(() => {
         this.fetchDevicesAsLocationmapToState('Regal1');
         this.fetchDeviceBookings();
     }, 5000);*/
-    this.doSocketConnection();
+    //this.doSocketConnection();
   }
 
-  fetchDevicesAsLocationmapToState = async group => {
+  fetchDevicesAsLocationmapToState = async () => {
     console.log("fetching devices");
     try {
       const deviceLocationMap = await getDevicesAsLocationMap(
         this.props.token,
         this.props.host,
-        group
+        this.state.place
       );
       this.setState({ devices: deviceLocationMap });
+    } catch (e) {
+      alert(e);
+    }
+  };
+
+  fetchPlace = async placeID => {
+    console.log("fetching place");
+    try {
+      const place = await getPlace(this.props.token, this.props.host, placeID);
+      this.setState({ place });
+      return place;
     } catch (e) {
       alert(e);
     }
@@ -83,7 +91,7 @@ class DeviceControl extends Component {
   fetchDeviceBookings = async () => {
     try {
       const deviceBookings = await fetchDeviceBookings(
-        this.state.devices,
+        this.state.place.positions,
         this.props.token,
         this.props.host
       );
@@ -93,9 +101,8 @@ class DeviceControl extends Component {
     }
   };
 
-  bookDevice = async deviceName => {
-    const booking = this.findBooking(deviceName, this.state.deviceBookings);
-
+  bookDevice = async deviceID => {
+    const booking = this.findBooking(deviceID, this.state.deviceBookings);
     if (!this.props.authenticated) {
       Alert.alert("Action forbidden", "You are not authenticated");
       return;
@@ -111,9 +118,7 @@ class DeviceControl extends Component {
           return;
         }
 
-        const isDeviceBooked = await endBooking(
-          deviceName,
-          this.props.userUID,
+        await endBooking(
           booking,
           this.props.token,
           this.props.intermediateToken,
@@ -125,7 +130,7 @@ class DeviceControl extends Component {
       }
 
       await startBooking(
-        deviceName,
+        deviceID,
         this.props.userUID,
         this.props.token,
         this.props.intermediateToken,
@@ -204,7 +209,7 @@ class DeviceControl extends Component {
             <DeviceAvatar
               avatarSize={AvatarSize}
               device={device}
-              isBooked={device ? this.isDeviceBooked(device.name) : false}
+              isBooked={device ? this.isDeviceBooked(device._id) : false}
               toggleFunction={this.bookDevice}
               key={index}
             />
@@ -214,22 +219,19 @@ class DeviceControl extends Component {
     );
   };
 
-  isDeviceBooked = deviceName => {
+  isDeviceBooked = deviceID => {
     return this.state.deviceBookings.some(booking => {
-      return booking.deviceName === deviceName;
+      return booking.deviceID === deviceID;
     });
   };
 
-  findBooking = (devicName, bookings) => {
+  findBooking = (deviceID) => {
     return this.state.deviceBookings.find(booking => {
-      return booking.deviceName === devicName;
+      return booking.deviceID === deviceID;
     });
   };
 
   render() {
-    const reversedDevices = this.state.devices.slice();
-    reversedDevices.reverse();
-
     return (
       <View
         style={{
@@ -238,7 +240,7 @@ class DeviceControl extends Component {
           backgroundColor: "#FFF"
         }}
       >
-        {reversedDevices && (
+        {this.state.devices && (
           <FlatList
             onLayout={event => this.measureView(event)}
             key={1}

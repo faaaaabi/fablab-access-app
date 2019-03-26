@@ -8,17 +8,23 @@ export const DeviceAvatar = props => {
       {props.device ? (
         <Avatar
           size={props.avatarSize}
-          overlayContainerStyle={ props.isBooked ? statusHaloStyle('inUse') : statusHaloStyle('free')} 
-          onPress={() => props.toggleFunction(props.device.name) }
+          overlayContainerStyle={
+            props.isBooked ? statusHaloStyle("inUse") : statusHaloStyle("free")
+          }
+          onPress={() => props.toggleFunction(props.device._id)}
           activeOpacity={0.7}
-          icon={{name: 'printer-3d', type: 'material-community'}}
+          icon={{ name: "printer-3d", type: "material-community" }}
         />
       ) : (
         <View style={{ width: props.avatarSize }} />
       )}
       {props.device && (
         <View style={{ width: props.avatarSize, paddingTop: 5 }}>
-          <Text style={{ fontSize: 14, fontWeight: 'bold', textAlign: 'center' }}>{props.device.name}</Text>
+          <Text
+            style={{ fontSize: 14, fontWeight: "bold", textAlign: "center" }}
+          >
+            {props.device.deviceName}
+          </Text>
         </View>
       )}
     </View>
@@ -28,20 +34,20 @@ export const DeviceAvatar = props => {
 const statusHaloStyle = status => {
   const style = {
     borderWidth: 6,
-    borderColor: '#000',
+    borderColor: "#000",
     borderRadius: 4
   };
 
   switch (status) {
-    case 'inUse':
+    case "inUse":
       style.borderColor = "#EAC787";
       break;
-    case 'blocked':
+    case "blocked":
       style.borderColor = "#E86E7F";
-      break
-    case 'free':
+      break;
+    case "free":
       style.borderColor = "#3F9490";
-      break
+      break;
     default:
       break;
   }

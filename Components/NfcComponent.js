@@ -285,11 +285,6 @@ class NfcComponent extends Component {
     }, time);
   };
 
-  _toggleDevice = async deviceName => {
-    if (this.props.authenticated) {
-      fetch(`http://${this.props.host}/devices/${deviceName}/toggleState`);
-    }
-  };
 }
 
 const styles = StyleSheet.create({
