@@ -84,6 +84,7 @@ export const getDevices = async (apiToken, apiUrl, deviceIDs) => {
 };
 
 export const getDevicesByPlace = async(apiToken, apiUrl, place) => {
+  console.log('places: ', place)
   const deviceIDs = place.positions.map(position => {
     return position.deviceID
   })

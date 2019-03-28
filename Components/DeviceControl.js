@@ -53,7 +53,7 @@ class DeviceControl extends Component {
       });
 
     await this.props.requestApiAuthentication();
-    await this.fetchPlace("5c988aefdb62b50007f2340a");
+    await this.fetchPlace("5c9c63fe85c19400095d7d7b");
     await this.fetchDevicesAsLocationmapToState();
     await this.fetchDeviceBookings();
     /*setInterval(() => {
@@ -104,7 +104,7 @@ class DeviceControl extends Component {
   bookDevice = async deviceID => {
     const booking = this.findBooking(deviceID, this.state.deviceBookings);
     if (!this.props.authenticated) {
-      Alert.alert("Action forbidden", "You are not authenticated");
+      Alert.alert("Action forbidden", "You are not authenticated. Please authenticate with your ID card");
       return;
     }
 
@@ -184,6 +184,8 @@ class DeviceControl extends Component {
   };
 
   DeviceRow = (item, index) => {
+    console.log("item: ", item);
+    console.log("state device:", this.state.devices);
     const AvatarSize = parseInt(this.state.width / 8);
     return (
       <View
@@ -205,15 +207,17 @@ class DeviceControl extends Component {
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>Fach {index}</Text>
         </View>
         <View style={{ flex: 0.9, flexDirection: "row" }}>
-          {item.map((device, index) => (
-            <DeviceAvatar
-              avatarSize={AvatarSize}
-              device={device}
-              isBooked={device ? this.isDeviceBooked(device._id) : false}
-              toggleFunction={this.bookDevice}
-              key={index}
-            />
-          ))}
+          {item
+            ? item.map((device, index) => (
+                <DeviceAvatar
+                  avatarSize={AvatarSize}
+                  device={device}
+                  isBooked={device ? this.isDeviceBooked(device._id) : false}
+                  toggleFunction={this.bookDevice}
+                  key={index}
+                />
+              ))
+            : <View style={{ height: AvatarSize }}></View>}
         </View>
       </View>
     );
@@ -225,7 +229,7 @@ class DeviceControl extends Component {
     });
   };
 
-  findBooking = (deviceID) => {
+  findBooking = deviceID => {
     return this.state.deviceBookings.find(booking => {
       return booking.deviceID === deviceID;
     });

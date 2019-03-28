@@ -4,7 +4,7 @@ import {
   View,
   Text,
   Platform,
-  Linking,
+  Alert,
   StyleSheet,
   ActivityIndicator
 } from "react-native";
@@ -104,7 +104,7 @@ class NfcComponent extends Component {
             <Button
               title="Simulate NFC Tag"
               onPress={() => {
-                this._onTagDiscovered({ id: "6B26F733" });
+                this._onTagDiscovered({ id: "9D909C1E"  });
               }}
             />
           </View>
@@ -262,29 +262,44 @@ class NfcComponent extends Component {
         body: `userID=${userUID}&apiKey=${this.props.apiKey}`
       });
       const responseJSON = await response.json();
-      if (response.status < 400) {
-        if (responseJSON.token) {
-          this.props.onAuthenticated({ authenticated: true, userUID: userUID, intermediateToken: responseJSON.token });
-          this.authPeriodTimer(20000);
-        }
-      } else if (response.status === 401 || response.status === 403) {
-        alert("Access Denied");
-      } else {
-        alert("Error checking access. Status code: " + response.status);
-      }
       this.setState({ isAuthRequestPending: false });
+      console.log('auth response status: ', response.status);
+      if (response.status > 399) {
+        if (response.status === 401 || response.status === 403) {
+          Alert.alert("Access denied", "You are not allowed to use devices. Please talk to the staff");
+          return;
+        }
+        if (response.status === 404) {
+          Alert.alert("User not found", "You user was not found. Please talk to the staff");
+          return;
+        }
+        Alert.alert("Error", "Error checking access. Error: " + e);
+        return;
+      }
+
+      if (responseJSON.token) {
+        this.props.onAuthenticated({
+          authenticated: true,
+          userUID: userUID,
+          intermediateToken: responseJSON.token
+        });
+        this.authPeriodTimer(20000);
+      }
     } catch (e) {
-      alert("Error checking access. Error: " + e);
+      Alert.alert("Error", "Error checking access. Error: " + e);
       this.setState({ isAuthRequestPending: false });
     }
   };
 
   authPeriodTimer = time => {
     setTimeout(() => {
-      this.props.onAuthenticated({ authenticated: false, userUID: null, intermediateToken: null});
+      this.props.onAuthenticated({
+        authenticated: false,
+        userUID: null,
+        intermediateToken: null
+      });
     }, time);
   };
-
 }
 
 const styles = StyleSheet.create({
