@@ -6,54 +6,53 @@
  * @flow
  */
 
-import React, {Component} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import { Provider } from 'react-redux'
-import { COLOR, Toolbar, ThemeContext, getTheme } from 'react-native-material-ui';
-import NfcComponent from './Components/NfcComponent';
-import DeviceControl from './Components/DeviceControl';
+import React, { Component } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { Provider } from "react-redux";
+import {
+  COLOR,
+  Toolbar,
+  ThemeContext,
+  getTheme
+} from "react-native-material-ui";
+import NfcComponent from "./Components/NfcComponent";
+import DeviceControl from "./Components/DeviceControl";
 
 // Redux
-import { createStore, applyMiddleware } from 'redux';
-import { rootReducer } from './store';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import { PersistGate } from 'redux-persist/integration/react';
-import thunk from 'redux-thunk';
-console.ignoredYellowBox = ['Remote debugger'];
-import { YellowBox } from 'react-native';
+import { createStore, applyMiddleware } from "redux";
+import { rootReducer } from "./store";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { PersistGate } from "redux-persist/integration/react";
+import thunk from "redux-thunk";
+console.ignoredYellowBox = ["Remote debugger"];
+import { YellowBox } from "react-native";
 YellowBox.ignoreWarnings([
-    'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+  "Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?"
 ]);
-
-
 
 // Store & Persistance
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['host', 'deviceName']
-}
+  whitelist: ["host", "deviceName"]
+};
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const store = createStore(
-  persistedReducer,
-  applyMiddleware(thunk)
-);
+const store = createStore(persistedReducer, applyMiddleware(thunk));
 const persistor = persistStore(store);
 
 // UI
 const uiTheme = {
   palette: {
-    primaryColor: '#5F9569',
+    primaryColor: "#5F9569"
   },
   toolbar: {
     container: {
-      height: 50,
-    },
-  },
+      height: 50
+    }
+  }
 };
-
 
 type Props = {};
 export default class App extends Component<Props> {
@@ -61,19 +60,19 @@ export default class App extends Component<Props> {
     return (
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <ThemeContext.Provider value={getTheme(uiTheme)} style={{flex: 1}}>
-          <Toolbar
-            leftElement="menu"
-            centerElement="Fablab sdf"
-            searchable={{
-            autoFocus: true,
-            placeholder: 'Search',
-            }}
-          />
-          <View style={{flexDirection: 'row', flex: 1}}>
-            <DeviceControl/>
-            <NfcComponent/>
-          </View>
+          <ThemeContext.Provider value={getTheme(uiTheme)} style={{ flex: 1 }}>
+            <Toolbar
+              leftElement="menu"
+              centerElement="Fablab sdf"
+              searchable={{
+                autoFocus: true,
+                placeholder: "Search"
+              }}
+            />
+            <View style={{ flexDirection: "row", flex: 1 }}>
+              <DeviceControl />
+              <NfcComponent />
+            </View>
           </ThemeContext.Provider>
         </PersistGate>
       </Provider>
@@ -85,20 +84,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F5FCFF"
   },
   welcome: {
     fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    textAlign: "center",
+    margin: 10
   },
   instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+    textAlign: "center",
+    color: "#333333",
+    marginBottom: 5
+  }
 });
-
-

@@ -3,18 +3,6 @@ import { URL, URLSearchParams } from "whatwg-url";
 global.URL = URL;
 global.URLSearchParams = URLSearchParams;
 
-const isDeviceBooked = (deviceName, bookings) => {
-  return bookings.some(booking => {
-    return booking.deviceName === deviceName;
-  });
-};
-
-const findBooking = (devicName, bookings) => {
-  return bookings.find(booking => {
-    return booking.deviceName === devicName;
-  });
-};
-
 export const fetchDeviceBookings = async (positions, token, host) => {
   console.log("fetching bookings");
   const headers = new Headers();
