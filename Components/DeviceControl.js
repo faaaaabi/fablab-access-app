@@ -79,10 +79,8 @@ class DeviceControl extends Component {
 
 	fetchDeviceBookings = async () => {
 		try {
-			const deviceBookings1 = await fetchDeviceBookings(this.state.place.positions, this.props.token, this.props.host);
-			this.setState({ deviceBookings: deviceBookings1 });
-			setTimeout(() => {
-			}, 1000);
+			const deviceBookings = await fetchDeviceBookings(this.state.place.positions, this.props.token, this.props.host);
+			this.setState({ deviceBookings: deviceBookings });
 		} catch (e) {
 			alert(e);
 		}
@@ -103,19 +101,22 @@ class DeviceControl extends Component {
 				}
 
 				await endBooking(booking, this.props.token, this.props.intermediateToken, this.props.host);
-				this.fetchDeviceBookings();
+				const deviceBookings = await fetchDeviceBookings(this.state.place.positions, this.props.token, this.props.host)
+				this.setState({ deviceBookings: deviceBookings });
 
 				return;
 			}
 
 			await startBooking(deviceID, this.props.userUID, this.props.token, this.props.intermediateToken, this.props.host);
-			this.fetchDeviceBookings();
+			const deviceBookings = await fetchDeviceBookings(this.state.place.positions, this.props.token, this.props.host)
+			this.setState({ deviceBookings: deviceBookings });
 		} catch (e) {
 			Alert.alert('Booking Error', `Following error occured: ${e}`);
 		}
 	};
 
-	DeviceRow = (item, index) => {
+	DeviceRow = (item, index, deviceBoookings) => {
+		console.log('Device Row')
 		const AvatarSize = parseInt((Dimensions.get('window').width * 0.7) / 8);
 		return (
 			<View
@@ -142,7 +143,7 @@ class DeviceControl extends Component {
 							<DeviceAvatar
 								avatarSize={AvatarSize}
 								device={device}
-								isBooked={device ? this.isDeviceBooked(device._id) : false}
+								isBooked={device ? this.isDeviceBooked(device._id, deviceBoookings) : false}
 								toggleFunction={this.bookDevice}
 								key={index}
 							/>
@@ -155,8 +156,8 @@ class DeviceControl extends Component {
 		);
 	};
 
-	isDeviceBooked = deviceID => {
-		return this.state.deviceBookings.some(booking => {
+	isDeviceBooked = (deviceID, deviceBookings) => {
+		return deviceBookings.some(booking => {
 			return booking.deviceID === deviceID;
 		});
 	};
@@ -187,6 +188,9 @@ class DeviceControl extends Component {
 	};
 
 	render() {
+		console.log('render');
+		console.log('state device bookings:', this.state.deviceBookings);
+		const deviceBookings = this.state.deviceBookings;
 		return (
 			<View
 				style={{
@@ -195,15 +199,16 @@ class DeviceControl extends Component {
 					backgroundColor: '#FFF',
 				}}
 			>
-				{this.state.devices && (
+				{this.state.devices && 
 					<FlatList
 						//onLayout={event => this.setLayoutParameters(event)}
 						key={1}
 						data={this.state.devices}
-						renderItem={({ item, index }) => this.DeviceRow(item, index)}
+						renderItem={({ item, index }) => this.DeviceRow(item, index, deviceBookings)}
+						extraData={this.state.deviceBookings}
 						keyExtractor={(item, index) => index.toString()}
 					/>
-				)}
+				}
 				<View style={{ flex: 1 }}>
 					<Modal isVisible={false} alignSelf="center">
 						<View
