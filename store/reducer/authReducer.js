@@ -6,9 +6,8 @@ const initialState = {
   authenticated: false,
   userUID: null,
   intermediateToken: null,
-  apiKey: 'SuperStrongAPIKey',
   token: null,
-}
+};
 
 const authReducer = (state = initialState, action) => {
   switch ( action.type ) {

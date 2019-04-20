@@ -6,9 +6,9 @@ import {
   statusReducer
 } from './reducer'
 
-export const rootReducer = combineReducers({
+export const reducers = {
   auth: authReducer,
   device: deviceReducer,
   settings: settingsReducer,
   status: statusReducer,
-});
+};

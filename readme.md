@@ -1,5 +1,5 @@
-# Fablab Access App
-App zur Zugriffskontrolle von Geräten im Fabalb
+# Fablab Access Dashboard
+Dashboard zur Zugriffskontrolle von Geräten im Fabalb
 
 ## Usage
 
@@ -31,13 +31,13 @@ $ npm install
 
 \* nur notwendig, wenn die Interaktion mit dem API-Gateway stattfinden soll.
 
-## App starten
+## Dashboard starten
 
 ### Endgerät vorbereiten
 * Entwickleroptionen im Gerät aktivieren
 * USB Debugging im Gerät aktivieren
 
-### App auf Endgerät ausführen
+### Dashboard auf Endgerät ausführen
 ```bash
 $ react-native run-android
 ```

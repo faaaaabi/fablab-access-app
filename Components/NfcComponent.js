@@ -324,7 +324,7 @@ const mapStateToProps = state => {
     token: state.auth.token,
     authenticated: state.auth.authenticated,
     host: state.settings.host,
-    apiKey: state.auth.apiKey,
+    apiKey: state.settings.apiKey,
     deviceName: state.settings.deviceName
   };
 };

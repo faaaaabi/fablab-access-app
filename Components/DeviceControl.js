@@ -46,15 +46,19 @@ class DeviceControl extends Component {
 				NetInfo.isConnected.addEventListener('connectionChange', dispatchConnected);
 			});
 
-		await this.props.requestApiAuthentication();
-		await this.fetchPlace('5c9c63fe85c19400095d7d7b');
-		await this.fetchDevicesAsLocationmapToState();
-		await this.fetchDeviceBookings();
+		await this.fetchAllThings();
 		/*setInterval(() => {
         this.fetchDevicesAsLocationmapToState('Regal1');
         this.fetchDeviceBookings();
     }, 5000);*/
 	}
+
+	fetchAllThings = async () => {
+		await this.props.requestApiAuthentication();
+		await this.fetchPlace('5c9c63fe85c19400095d7d7b');
+		await this.fetchDevicesAsLocationmapToState();
+		await this.fetchDeviceBookings();
+	};
 
 	fetchDevicesAsLocationmapToState = async () => {
 		console.log('fetching devices');
@@ -235,7 +239,7 @@ const mapStateToProps = state => {
 		userUID: state.auth.userUID,
 		host: state.settings.host,
 		isConnected: state.status.isConnected,
-		apiKey: state.auth.apiKey,
+		apiKey: state.settings.apiKey,
 		token: state.auth.token,
 		intermediateToken: state.auth.intermediateToken,
 	};
