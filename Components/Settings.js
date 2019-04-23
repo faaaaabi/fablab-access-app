@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {View, Platform} from 'react-native';
-import {Header, Icon, Text, Input, Button} from "react-native-elements";
+import {Header, Icon, Input, Button, CheckBox} from "react-native-elements";
 import {Navigation} from "react-native-navigation";
 import {connect} from "react-redux";
 import {requestApiAuthentication} from "../store/actions/authActions";
-import {API_KEY_CHANGED, HOST_CHANGED, ON_SETTINGS_SAVE} from "../store/actions/actionTypes";
+import {ON_SETTINGS_SAVE} from "../store/actions/actionTypes";
 
 class Settings extends Component {
     constructor(props) {
@@ -12,7 +12,8 @@ class Settings extends Component {
         this.state = {
             host: this.props.host,
             apiKey: this.props.apiKey,
-            deviceName: this.props.deviceName
+            deviceName: this.props.deviceName,
+            debugMode: this.props.debugMode,
         }
     }
 
@@ -23,13 +24,14 @@ class Settings extends Component {
         this.props.onSettingsSave({
             host: this.state.host,
             apiKey: this.state.apiKey,
-            deviceName: this.state.deviceName
+            deviceName: this.state.deviceName,
+            debugMode: this.state.debugMode,
         });
     };
 
     render() {
         return (
-            <View style={{flex: 1, alignItems: 'center'}}>
+            <View style={{flex: 1, alignItems: 'center', backgroundColor: '#fff'}}>
                 <Header
                     leftComponent={
                         <Icon
@@ -72,8 +74,14 @@ class Settings extends Component {
                         onChangeText={(text) => this.setState({deviceName: text})}
                         //errorMessage='ENTER A VALID ERROR HERE'
                     >{this.state.deviceName}</Input>
+                    <CheckBox
+                        containerStyle={{paddingBottom: 20}}
+                        title='Debug Mode'
+                        checked={this.state.debugMode}
+                        onPress={() => this.setState({debugMode: !this.state.debugMode})}
+                    />
                     <Button
-                        title="Save Settings"
+                        title='Save Settings'
                         onPress={() => {
                             this.saveSettings();
                         }}
@@ -92,7 +100,8 @@ const mapStateToProps = state => {
     return {
         host: state.settings.host,
         apiKey: state.settings.apiKey,
-        deviceName: state.settings.deviceName
+        deviceName: state.settings.deviceName,
+        debugMode: state.settings.debugMode,
     };
 };
 
@@ -105,10 +114,6 @@ const mapDispatchToProps = dispatch => {
             }),
     };
 
-};
-
-const actions = {
-    requestApiAuthentication,
 };
 
 export default connect(

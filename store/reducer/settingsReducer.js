@@ -1,18 +1,19 @@
 const initialState = {
     host: '10.2.236.38:8083',
     apiKey: 'SuperStrongAPIKey',
-    deviceName: null,
+    deviceName: 'AccessDevice1',
+    debugMode: false,
 };
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ON_SETTINGS_SAVE':
-            console.log(action.value);
             return {
                 ...state,
                 host: action.value.host,
                 apiKey: action.value.apiKey,
                 deviceName: action.value.deviceName,
+                debugMode: action.value.debugMode,
             };
         case 'HOST_CHANGED':
             return {
@@ -29,7 +30,6 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 deviceName: action.value
             };
-        default: console.log('No matched action')
     }
     return state;
 };

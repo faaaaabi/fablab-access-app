@@ -12,13 +12,8 @@ import {Header, Icon} from "react-native-elements/src/index";
 import NfcComponent from "./NfcComponent";
 import DeviceControl from "./DeviceControl";
 
-console.ignoredYellowBox = ["Remote debugger"];
-import {YellowBox} from "react-native";
-import {goToSettings} from "../navigation";
 
-YellowBox.ignoreWarnings([
-    "Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?"
-]);
+import {goToSettings} from "../navigation";
 
 type
 Props = {};
