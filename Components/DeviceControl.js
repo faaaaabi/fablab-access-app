@@ -100,6 +100,21 @@ class DeviceControl extends Component {
     }
   };
 
+  isDeviceBooked = (deviceID, deviceBookings) => {
+    return deviceBookings.some(booking => {
+      return booking.deviceID === deviceID;
+    });
+  };
+
+  findBooking = deviceID => {
+    return this.state.deviceBookings.find(booking => {
+      return booking.deviceID === deviceID;
+    });
+  };
+
+  /*
+   *  Returns a Row of devices for the Flatlist Component
+   */
   DeviceRow = (item, index, deviceBoookings) => {
     const AvatarSize = parseInt((Dimensions.get('window').width * 0.7) / 8);
     return (
@@ -140,18 +155,6 @@ class DeviceControl extends Component {
     );
   };
 
-  isDeviceBooked = (deviceID, deviceBookings) => {
-    return deviceBookings.some(booking => {
-      return booking.deviceID === deviceID;
-    });
-  };
-
-  findBooking = deviceID => {
-    return this.state.deviceBookings.find(booking => {
-      return booking.deviceID === deviceID;
-    });
-  };
-
   render() {
     const deviceBookings = this.state.deviceBookings;
     return (
@@ -164,7 +167,6 @@ class DeviceControl extends Component {
       >
         {this.state.devices &&
         <FlatList
-          //onLayout={event => this.setLayoutParameters(event)}
           key={1}
           data={this.state.devices}
           renderItem={({item, index}) => this.DeviceRow(item, index, deviceBookings)}
