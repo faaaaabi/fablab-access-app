@@ -73,4 +73,24 @@ Die App sollte nun die für ihren `Place` konfigurierten Geräte anzeigen.
   * Ein Benutzer kann nur Buchungen beenden, die er auch initiert hat
   * Das API-Gateway erzeugt für eine Rechnung auf den Namen des Nutzers und schaltet das verknüpfte Gerät ab
 
+## TODO
+- [ ] NFC Komponente streamlinen (nicht benötigte komponenten raus. Logik auslagern)
+- [ ] DeviceControl Komponente "dumme" Kompoenten Anteile auslagern
+- [ ] authActions in DeviceCotrol Komponente überführen (globale Verfügbarkeit nicht notwendig)
+- [ ] Visualisierung für einzelne Geräte implementieren
+- [ ] Visualisierung für "Boden" Geräte implementieren
+- [ ] Einstellungen durch Admin-Authentifizierung absichern
+- [ ] Bestätigung von Nutzungsbedingungen bei Buchung implementieren
+- [ ] Sicherheitsabfrage (PIN) bei markierten (gefährlichen) Geräten implementieren
+- [ ] Abfrage von Geräte Icons von der API
+- [ ] `npm audit` für vulnerable Pakete durchführen
+- [ ] JS Timer gegn ReactNative Timer austauschen
+- [ ] Alex Requests auf axios umstellen
+- [ ] Tests
+- [ ] Echtzeitkommunikation:  Websockets/Polling für Aktualisierung implementieren
+- to be continued
 
+## LICENSE
+Unter Vorbehalt*: [MIT License](https://opensource.org/licenses/MIT)
+
+*Bis die Absichtserkärung aufgesetzt ist
