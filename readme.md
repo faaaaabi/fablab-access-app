@@ -91,6 +91,4 @@ Die App sollte nun die für ihren `Place` konfigurierten Geräte anzeigen.
 - to be continued
 
 ## LICENSE
-Unter Vorbehalt*: [MIT License](https://opensource.org/licenses/MIT)
-
-*Bis die Absichtserkärung aufgesetzt ist
+License Pending
