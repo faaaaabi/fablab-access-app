@@ -91,4 +91,4 @@ Die App sollte nun die für ihren `Place` konfigurierten Geräte anzeigen.
 - to be continued
 
 ## LICENSE
-License Pending
+MIT License - see license file
