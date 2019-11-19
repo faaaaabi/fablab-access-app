@@ -7,6 +7,8 @@ Weiter verwendet:
 * [redux-thunk](https://github.com/reduxjs/redux-thunk) Zur Orchestrierung komplexerer Actions (Redux)
 * [react-native-navigation](https://github.com/wix/react-native-navigation) Zur Erzeugung nativer Navigation in der App
 
+![App Screenshot](/AppScreenshot1.png?raw=true "App Screenshot")
+
 ## Usage
 
 ### node.js installieren
