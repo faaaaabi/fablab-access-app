@@ -2,6 +2,8 @@
 Android App zur Zugriffskontrolle von Geräten im Fabalb. Diese App wurde mit React-Native erstellt und verwendet die aus
 React bekannten Konzepte von Komponenten. Für die Komponentenübegreifende Verwaltung von State wirde Redux verwendet.
 
+**Note: This work in progress. Everything is still in flux and things may not work as expected**
+
 Weiter verwendet:
 * [redux-persist](https://github.com/rt2zz/redux-persist) Zur Persistierung bestimmter Daten
 * [redux-thunk](https://github.com/reduxjs/redux-thunk) Zur Orchestrierung komplexerer Actions (Redux)
