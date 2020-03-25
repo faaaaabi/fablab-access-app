@@ -95,4 +95,4 @@ Die App sollte nun die für ihren `Place` konfigurierten Geräte anzeigen.
 - to be continued
 
 ## LICENSE
-MIT License - see license file
+GNU GPLv3 license - see license file
