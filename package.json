@@ -9,7 +9,7 @@
     "android": "cd ./android && ./gradlew app:assembleDebug --stacktrace && ./gradlew installDebug"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.2",
     "buffer": "^5.2.1",
     "qs": "^6.7.0",
     "react": "16.6.0-alpha.8af6728",
